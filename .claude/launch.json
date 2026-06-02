@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "style-a",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "3101", "-s", "."],
+      "port": 3101
+    },
+    {
+      "name": "style-b",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-p", "3102", "-s", "."],
+      "port": 3102
+    }
+  ]
+}
