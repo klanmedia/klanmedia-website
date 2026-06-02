@@ -28,27 +28,16 @@ function KeyRow({ children, style }: { children: React.ReactNode; style?: React.
 
 // ── Component ─────────────────────────────────────────────────
 export default function LaptopMockup() {
-  const tiltRef  = useRef<HTMLDivElement>(null)
-  const floatRef = useRef<HTMLDivElement>(null)
+  const tiltRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const tilt   = tiltRef.current
-    const floater = floatRef.current
-    if (!tilt || !floater) return
+    const tilt = tiltRef.current
+    if (!tilt) return
 
     // Initial isometric pose
     gsap.set(tilt, { rotationX: 20, rotationY: -12 })
 
-    // Float animation on inner layer (translateY only — never conflicts with tilt)
-    const floatTween = gsap.to(floater, {
-      y: -20,
-      duration: 5.5,
-      ease: 'sine.inOut',
-      repeat: -1,
-      yoyo: true,
-    })
-
-    // Mouse tilt on outer layer
+    // Mouse tilt
     const baseX = 20, baseY = -12
     const setRotY = gsap.quickTo(tilt, 'rotationY', { duration: 0.12, ease: 'power1.out' })
     const setRotX = gsap.quickTo(tilt, 'rotationX', { duration: 0.12, ease: 'power1.out' })
@@ -61,10 +50,7 @@ export default function LaptopMockup() {
     }
 
     window.addEventListener('mousemove', onMove)
-    return () => {
-      floatTween.kill()
-      window.removeEventListener('mousemove', onMove)
-    }
+    return () => window.removeEventListener('mousemove', onMove)
   }, [])
 
   return (
@@ -75,8 +61,8 @@ export default function LaptopMockup() {
       {/* Layer 1 — mouse-controlled tilt (rotateX / rotateY) */}
       <div ref={tiltRef} style={{ transformStyle: 'preserve-3d' }}>
 
-        {/* Layer 2 — float animation (translateY only) */}
-        <div ref={floatRef} style={{ transformStyle: 'preserve-3d' }}>
+        {/* Layer 2 — float animation via CSS (reliable cross-device) */}
+        <div style={{ transformStyle: 'preserve-3d', animation: 'laptopFloat 5.5s ease-in-out infinite' }}>
 
           {/* Content */}
           <div style={{ transformStyle: 'preserve-3d', position: 'relative', marginTop: '80px', width: '580px' }}>
