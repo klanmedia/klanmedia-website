@@ -36,7 +36,7 @@ export default function ImpressumPage() {
         </Section>
 
         <Section title="Kontakt">
-          <p>E-Mail: <a href="mailto:klanmediadev@gmail.com" className="text-brand hover:underline">klanmediadev@gmail.com</a></p>
+          <p>E-Mail: <a href="mailto:info@klanmedia.de" className="text-brand hover:underline">info@klanmedia.de</a></p>
         </Section>
 
         <Section title="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV">

@@ -31,7 +31,7 @@ export default function DatenschutzPage() {
           <p>Verantwortlicher im Sinne der DSGVO ist:</p>
           <p className="font-semibold text-gray-900">Benno Klan · klanmedia</p>
           <p>Am Gaißbichl 1, 83135 Schechen</p>
-          <p>E-Mail: <a href="mailto:klanmediadev@gmail.com" className="text-brand hover:underline">klanmediadev@gmail.com</a></p>
+          <p>E-Mail: <a href="mailto:info@klanmedia.de" className="text-brand hover:underline">info@klanmedia.de</a></p>
         </Section>
 
         <Section title="2. Erhebung und Verarbeitung personenbezogener Daten">
@@ -137,7 +137,7 @@ export default function DatenschutzPage() {
           </ul>
           <p className="mt-2">
             Zur Ausübung Ihrer Rechte wenden Sie sich an:{' '}
-            <a href="mailto:klanmediadev@gmail.com" className="text-brand hover:underline">klanmediadev@gmail.com</a>
+            <a href="mailto:info@klanmedia.de" className="text-brand hover:underline">info@klanmedia.de</a>
           </p>
           <p>
             Außerdem haben Sie das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Die

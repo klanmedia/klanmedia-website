@@ -172,11 +172,11 @@ export default function KontaktPage() {
             <div className="bg-gray-50 rounded-2xl border border-gray-100 p-7">
               <div className="text-[12px] font-bold uppercase tracking-widest text-gray-400 mb-4">Direktkontakt</div>
               <div className="flex flex-col gap-4">
-                <a href="mailto:Benno-Klan@gmx.de" className="flex items-center gap-3 group">
+                <a href="mailto:info@klanmedia.de" className="flex items-center gap-3 group">
                   <span className="text-xl">✉️</span>
                   <div>
                     <div className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-0.5">E-Mail</div>
-                    <span className="text-sm font-semibold text-gray-900 group-hover:text-brand transition-colors">Benno-Klan@gmx.de</span>
+                    <span className="text-sm font-semibold text-gray-900 group-hover:text-brand transition-colors">info@klanmedia.de</span>
                   </div>
                 </a>
               </div>
