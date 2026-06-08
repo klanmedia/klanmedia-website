@@ -214,21 +214,26 @@ export default async function HomePage() {
                 Services ansehen
               </Link>
             </div>
+
           </div>
 
           {/*
-            Laptop scale ladder:
-            - mobile/sm/md/lg: absolute positioned in fixed-height container (580px taken out of flow)
-            - xl (1280px+): static, full 580px, fits in the 584px column
-            Heights are calculated as: laptop_layout_height(~605px) × scale
+            Laptop scale ladder (absolute-positioned in fixed-height container to keep it out of flow):
+              <640   → 0.36 → h-[215px]
+              640    → 0.48 → h-[290px]
+              768    → 0.62 → h-[375px]
+              1024   → 0.80 → h-[480px]
+              1280   → 0.75 → h-[454px]  xl: two-column, scale-75 fits in 584px col, badges stay in viewport
+              1536+  → 1.00 → static/auto 2xl: enough space for full-size laptop
+            Heights ≈ laptop_layout_height (~605px) × scale
           */}
           <div className="relative flex justify-center overflow-hidden
-            h-[215px] sm:h-[290px] md:h-[375px] lg:h-[480px]
-            xl:overflow-visible xl:h-auto">
+            h-[215px] sm:h-[290px] md:h-[375px] lg:h-[480px] xl:h-[454px]
+            xl:overflow-visible 2xl:h-auto">
             <div className="
               absolute top-0 left-1/2 -translate-x-1/2 origin-top
-              scale-[0.36] sm:scale-[0.48] md:scale-[0.62] lg:scale-[0.80]
-              xl:static xl:translate-x-0 xl:scale-100
+              scale-[0.36] sm:scale-[0.48] md:scale-[0.62] lg:scale-[0.80] xl:scale-[0.75]
+              2xl:static 2xl:translate-x-0 2xl:scale-100
             ">
               <LaptopMockup />
             </div>

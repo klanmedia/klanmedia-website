@@ -28,20 +28,27 @@ function KeyRow({ children, style }: { children: React.ReactNode; style?: React.
 
 // ── Component ─────────────────────────────────────────────────
 export default function LaptopMockup() {
-  const tiltRef = useRef<HTMLDivElement>(null)
+  const tiltRef      = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)   // .hero-visual — position anchor for scroll calc
+  const wrapperRef   = useRef<HTMLDivElement>(null)   // plain div OUTSIDE 3D stack — opacity only
 
   useEffect(() => {
-    const tilt = tiltRef.current
-    if (!tilt) return
+    const tilt      = tiltRef.current
+    const container = containerRef.current
+    const wrapper   = wrapperRef.current
+    if (!tilt || !container || !wrapper) return
 
-    // Initial isometric pose
-    gsap.set(tilt, { rotationX: 20, rotationY: -12 })
+    // More dramatic isometric angle on mobile for better 3D visibility at small scale
+    const isMobile = window.innerWidth < 1280
+    const baseX = isMobile ? 26 : 20
+    const baseY = isMobile ? -20 : -12
 
-    // Mouse tilt
-    const baseX = 20, baseY = -12
+    gsap.set(tilt, { rotationX: baseX, rotationY: baseY })
+
     const setRotY = gsap.quickTo(tilt, 'rotationY', { duration: 0.12, ease: 'power1.out' })
     const setRotX = gsap.quickTo(tilt, 'rotationX', { duration: 0.12, ease: 'power1.out' })
 
+    // Desktop: mouse tilt
     const onMove = (e: MouseEvent) => {
       const dx = (e.clientX / window.innerWidth  - 0.5) * 2
       const dy = (e.clientY / window.innerHeight - 0.5) * 2
@@ -49,12 +56,43 @@ export default function LaptopMockup() {
       setRotY(baseY + dx * 8)
     }
 
+    // Scroll-exit: laptop tilts + fades only as it LEAVES the viewport.
+    // exit=0 when bottom at 70% vh (fully visible), exit=1 when bottom at 20% vh.
+    //
+    // IMPORTANT: opacity is animated on wrapperRef (a plain div, no preserve-3d),
+    // NOT on tiltRef. Animating opacity on a preserve-3d element forces a new
+    // stacking context that overrides preserve-3d and flattens/flips 3D children.
+    const onScroll = () => {
+      const rect = container.getBoundingClientRect()
+      const vh   = window.innerHeight
+      const exit = Math.max(0, Math.min(1, (vh * 0.7 - rect.bottom) / (vh * 0.5)))
+      gsap.to(tilt, {
+        rotationX: baseX + exit * 18,
+        duration:  0.3,
+        ease:      'power1.out',
+        overwrite: true,
+      })
+      gsap.to(wrapper, {
+        opacity:  1 - exit,
+        duration: 0.3,
+        ease:     'power1.out',
+        overwrite: true,
+      })
+    }
+
     window.addEventListener('mousemove', onMove)
-    return () => window.removeEventListener('mousemove', onMove)
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [])
 
   return (
+    <div ref={wrapperRef}>
     <div
+      ref={containerRef}
       className="hero-visual flex items-center justify-center select-none"
       style={{ perspective: '1800px', perspectiveOrigin: '50% 44%' }}
     >
@@ -332,6 +370,7 @@ export default function LaptopMockup() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }

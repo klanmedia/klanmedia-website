@@ -1,25 +1,41 @@
-// Native anchor link — works without JavaScript (same as "Projekt starten")
-// smooth scroll is handled by CSS scroll-behavior:smooth in globals.css
+'use client'
+
+// Desktop-only (hidden xl:flex). Fades out as soon as the hero section
+// leaves the viewport — so it never floats over non-dark sections.
+import { useEffect, useState } from 'react'
 
 export default function ScrollIndicator() {
+  const [show, setShow] = useState(true)
+
+  useEffect(() => {
+    const hero = document.querySelector('.hero-section') as Element | null
+    if (!hero) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setShow(entry.isIntersecting),
+      { threshold: 0.05 }
+    )
+    obs.observe(hero)
+    return () => obs.disconnect()
+  }, [])
+
   return (
     <a
       href="#after-hero"
       aria-label="Nach unten scrollen"
+      className="hidden xl:flex flex-col items-center gap-1.5"
       style={{
         position: 'fixed',
         bottom: '24px',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 20,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '6px',
         textDecoration: 'none',
         padding: '8px 14px',
         touchAction: 'manipulation',
         color: 'rgba(255,255,255,0.38)',
+        opacity: show ? 1 : 0,
+        pointerEvents: show ? 'auto' : 'none',
+        transition: 'opacity 0.5s ease',
       }}
     >
       <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
