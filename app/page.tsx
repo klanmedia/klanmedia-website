@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import * as si from 'simple-icons'
 import ScrollAnimations from './_components/ScrollAnimations'
+import ScrollIndicator from './_components/ScrollIndicator'
 import Faq from './_components/Faq'
 import LaptopMockup from './_components/LaptopMockup'
 import TerminalWindow from './_components/TerminalWindow'
@@ -178,13 +179,19 @@ export default async function HomePage() {
         {/* Particles canvas */}
         <ParticlesBg />
 
-        <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20">
+        {/*
+          Grid: xl:grid-cols-2 (not lg:) so the two-column layout only kicks in at 1280px+.
+          At 1280px, each column is (1280-48-64)/2 ≈ 584px — the laptop (580px) just fits.
+          At lg (1024px), a column would be only ~456px — laptop would overflow → iPad issue.
+          Single column on everything below xl: laptop sits below text, properly scaled.
+        */}
+        <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 xl:grid-cols-2 gap-8 xl:gap-16 items-center py-16 xl:py-20">
           {/* Left: Text */}
           <div className="hero-content flex flex-col items-start">
             <div className="hero-badge inline-flex items-center gap-2 border border-brand/35 bg-brand/10 text-brand-muted text-[11px] font-bold tracking-widest uppercase px-4 py-1.5 rounded-full mb-9">
               Webentwicklung · Hosting · Support
             </div>
-            <h1 className="hero-title text-[clamp(36px,5vw,62px)] font-extrabold leading-[1.05] tracking-[-2px] text-white max-w-2xl mb-6">
+            <h1 className="hero-title text-[clamp(32px,5vw,62px)] font-extrabold leading-[1.05] tracking-[-2px] text-white max-w-2xl mb-6">
               Ihre professionelle Website —{' '}
               <em className="not-italic text-brand">entwickelt & betrieben</em>{' '}
               aus einer Hand.
@@ -192,30 +199,49 @@ export default async function HomePage() {
             <p className="hero-sub text-lg text-white/45 leading-relaxed max-w-md mb-11">
               Wir entwickeln Ihre Website und kümmern uns um den gesamten Betrieb — damit Sie sich auf Ihr Unternehmen konzentrieren können.
             </p>
-            <div className="hero-btns flex items-center gap-3">
+            <div className="hero-btns flex flex-wrap items-center gap-3">
               <Link
                 href="/kontakt"
-                className="bg-brand text-white font-bold text-[15px] px-8 py-3.5 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-brand text-white font-bold text-[15px] px-7 py-3.5 rounded-lg hover:bg-blue-700 transition-colors"
                 style={{ boxShadow: '0 0 40px rgba(37,99,235,0.35)' }}
               >
                 Projekt starten
               </Link>
               <Link
                 href="/services"
-                className="bg-white/5 border border-white/10 text-white/75 font-semibold text-[15px] px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors"
+                className="bg-white/5 border border-white/10 text-white/75 font-semibold text-[15px] px-7 py-3.5 rounded-lg hover:bg-white/10 transition-colors"
               >
                 Services ansehen
               </Link>
             </div>
           </div>
 
-          {/* Right: 3D Laptop */}
-          <LaptopMockup />
+          {/*
+            Laptop scale ladder:
+            - mobile/sm/md/lg: absolute positioned in fixed-height container (580px taken out of flow)
+            - xl (1280px+): static, full 580px, fits in the 584px column
+            Heights are calculated as: laptop_layout_height(~605px) × scale
+          */}
+          <div className="relative flex justify-center overflow-hidden
+            h-[215px] sm:h-[290px] md:h-[375px] lg:h-[480px]
+            xl:overflow-visible xl:h-auto">
+            <div className="
+              absolute top-0 left-1/2 -translate-x-1/2 origin-top
+              scale-[0.36] sm:scale-[0.48] md:scale-[0.62] lg:scale-[0.80]
+              xl:static xl:translate-x-0 xl:scale-100
+            ">
+              <LaptopMockup />
+            </div>
+          </div>
         </div>
+
       </section>
 
+      {/* Scroll indicator — fixed to viewport bottom, anchor link (no JS needed) */}
+      <ScrollIndicator />
+
       {/* SO LÄUFT'S AB */}
-      <section className="border-b border-gray-100">
+      <section id="after-hero" className="border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-10" data-animate="stagger">
           {steps.map((step, i) => (
             <div key={step.number} className="flex flex-col gap-3">

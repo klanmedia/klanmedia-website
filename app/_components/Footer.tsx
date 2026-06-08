@@ -8,7 +8,7 @@ export default function Footer() {
           klan<span className="text-brand">media</span>
         </Link>
 
-        <nav className="flex items-center gap-6">
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <Link href="/services" className="text-sm text-white/35 hover:text-white/70 transition-colors">
             Services
           </Link>
