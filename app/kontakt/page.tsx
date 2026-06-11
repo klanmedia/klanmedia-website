@@ -1,20 +1,50 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import PageHero from '../_components/PageHero'
 
+type Konfig = {
+  paket: string | null
+  hosting: string | null
+  features: string[]
+  preis_einmalig: number | null
+  preis_monatlich: number | null
+}
+
+function KonfigSummary({ konfig }: { konfig: Konfig }) {
+  const lines = [
+    konfig.paket    && `Paket: ${konfig.paket}`,
+    konfig.hosting  && `Hosting: ${konfig.hosting}`,
+    ...(konfig.features ?? []),
+  ].filter(Boolean) as string[]
+
+  return (
+    <div className="bg-brand/5 border border-brand/20 rounded-xl px-5 py-4 flex items-start gap-3">
+      <span className="text-brand font-bold text-lg mt-0.5 shrink-0">✓</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-900 mb-1">Konfiguration übernommen</p>
+        <ul className="text-xs text-gray-500 leading-relaxed space-y-0.5">
+          {lines.map(l => <li key={l}>{l}</li>)}
+          {konfig.preis_einmalig  != null && <li className="font-medium text-gray-700">Einmalig: {konfig.preis_einmalig.toLocaleString('de-DE')} €</li>}
+          {konfig.preis_monatlich != null && <li className="font-medium text-gray-700">Monatlich: {konfig.preis_monatlich.toLocaleString('de-DE')} €/Mo</li>}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
 function KontaktForm() {
   const searchParams = useSearchParams()
-  const configParam = searchParams.get('config')
 
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    message: configParam ? `Meine Auswahl aus dem Konfigurator:\n${decodeURIComponent(configParam)}\n\n` : '',
-  })
+  const konfig: Konfig | null = (() => {
+    try {
+      const raw = searchParams.get('konfig')
+      return raw ? (JSON.parse(raw) as Konfig) : null
+    } catch { return null }
+  })()
+
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', message: '' })
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -28,10 +58,7 @@ function KontaktForm() {
     const res = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        config: configParam ?? undefined,
-      }),
+      body: JSON.stringify({ ...form, konfig: konfig ?? null }),
     })
     setLoading(false)
     if (res.ok) {
@@ -56,15 +83,7 @@ function KontaktForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      {configParam && (
-        <div className="bg-brand/5 border border-brand/20 rounded-xl px-5 py-4 flex items-start gap-3">
-          <span className="text-brand font-bold text-lg mt-0.5 shrink-0">✓</span>
-          <div>
-            <p className="text-sm font-semibold text-gray-900 mb-1">Konfiguration übernommen</p>
-            <p className="text-xs text-gray-500 leading-relaxed">Ihre Auswahl aus dem Konfigurator wurde in die Nachricht eingetragen — Sie können sie unten noch anpassen.</p>
-          </div>
-        </div>
-      )}
+      {konfig && <KonfigSummary konfig={konfig} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>

@@ -5,15 +5,17 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Login-Seite ist immer zugänglich
-  if (pathname === '/admin/login') return NextResponse.next({ request })
-
   // Basis-Response vorbereiten (Request-Headers weiterleiten)
   const requestHeaders = new Headers(request.headers)
 
   // Navbar/Footer im Root-Layout ausblenden (nur für UI-Routen, nicht API)
   if (pathname.startsWith('/admin')) {
     requestHeaders.set('x-is-admin', '1')
+  }
+
+  // Login-Seite ist immer zugänglich (aber nav trotzdem ausblenden)
+  if (pathname === '/admin/login') {
+    return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
   // Session prüfen (für beide: /admin/* und /api/admin/*)

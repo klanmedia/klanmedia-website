@@ -7,6 +7,7 @@ import LaptopMockup from './_components/LaptopMockup'
 import TerminalWindow from './_components/TerminalWindow'
 import ParticlesBg from './_components/ParticlesBg'
 import { getFlags, flag } from '@/lib/flags'
+import { ctaHref, ctaLabel } from '@/lib/cta'
 
 function getSimpleIcon(slug: string): string {
   const key = ('si' + slug.charAt(0).toUpperCase() + slug.slice(1)) as keyof typeof si
@@ -201,11 +202,11 @@ export default async function HomePage() {
             </p>
             <div className="hero-btns flex flex-wrap items-center gap-3">
               <Link
-                href="/kontakt"
+                href={ctaHref(flags)}
                 className="bg-brand text-white font-bold text-[15px] px-7 py-3.5 rounded-lg hover:bg-blue-700 transition-colors"
                 style={{ boxShadow: '0 0 40px rgba(37,99,235,0.35)' }}
               >
-                Projekt starten
+                {ctaLabel(flags, 'Paket konfigurieren', 'Projekt starten')}
               </Link>
               <Link
                 href="/services"

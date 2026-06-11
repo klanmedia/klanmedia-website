@@ -2,6 +2,7 @@ import Link from 'next/link'
 import PageHero from '../_components/PageHero'
 import HeroTitle from '../_components/HeroTitle'
 import { getFlags, flag } from '@/lib/flags'
+import { ctaHref, ctaLabel } from '@/lib/cta'
 import { getHeroText } from '@/lib/content'
 import type { Metadata } from 'next'
 
@@ -82,9 +83,9 @@ export default async function PreisePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/kontakt" className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
+              <Link href={ctaHref(flags)} className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
                 style={pkg.highlight ? { boxShadow: '0 0 25px rgba(37,99,235,0.3)' } : {}}>
-                Anfragen
+                {ctaLabel(flags)}
               </Link>
             </div>
           ))}
@@ -139,9 +140,9 @@ export default async function PreisePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/kontakt" className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
+                <Link href={ctaHref(flags)} className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
                   style={pkg.highlight ? { boxShadow: '0 0 25px rgba(37,99,235,0.3)' } : {}}>
-                  Anfragen
+                  {ctaLabel(flags)}
                 </Link>
               </div>
             ))}
@@ -195,9 +196,9 @@ export default async function PreisePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/kontakt" className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
+              <Link href={ctaHref(flags)} className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
                 style={pkg.highlight ? { boxShadow: '0 0 25px rgba(37,99,235,0.3)' } : {}}>
-                Anfragen
+                {ctaLabel(flags)}
               </Link>
             </div>
           ))}
@@ -252,9 +253,9 @@ export default async function PreisePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/kontakt" className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
+                <Link href={ctaHref(flags)} className={`text-center text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors ${pkg.highlight ? 'bg-brand text-white hover:bg-blue-700' : 'border border-gray-200 text-gray-700 hover:border-brand hover:text-brand'}`}
                   style={pkg.highlight ? { boxShadow: '0 0 25px rgba(37,99,235,0.3)' } : {}}>
-                  Anfragen
+                  {ctaLabel(flags)}
                 </Link>
               </div>
             ))}

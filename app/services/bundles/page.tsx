@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import PageHero from '../../_components/PageHero'
 import HeroTitle from '../../_components/HeroTitle'
 import { getFlags, flag } from '@/lib/flags'
+import { ctaHref, ctaLabel } from '@/lib/cta'
 import { getHeroText } from '@/lib/content'
 import type { Metadata } from 'next'
 
@@ -189,7 +190,7 @@ export default async function BundlesPage() {
               </ul>
 
               <Link
-                href="/kontakt"
+                href={ctaHref(flags)}
                 className={`text-center font-semibold text-sm px-6 py-3 rounded-lg transition-colors ${
                   bundle.highlight
                     ? 'bg-brand text-white hover:bg-blue-700'

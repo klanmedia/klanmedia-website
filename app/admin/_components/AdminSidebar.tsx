@@ -4,14 +4,40 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createBrowserSupabase } from '@/lib/supabase'
 
-const navItems = [
-  { href: '/admin',               label: 'Dashboard',         icon: '▦' },
-  { href: '/admin/anfragen',      label: 'Kontaktanfragen',   icon: '✉' },
-  { href: '/admin/inhalte',       label: 'Hero-Texte',        icon: '✏' },
-  { href: '/admin/demos',         label: 'Demos',             icon: '🎬' },
-  { href: '/admin/projekte',      label: 'Projekte',          icon: '🖥️' },
-  { href: '/admin/produkte',      label: 'Produkte',          icon: '📦' },
-  { href: '/admin/einstellungen', label: 'Einstellungen',     icon: '⚙' },
+type NavItem = { href: string; label: string; icon: string }
+type NavGroup = { group: string; items: NavItem[] }
+
+const navGroups: NavGroup[] = [
+  {
+    group: '',
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: '▦' },
+    ],
+  },
+  {
+    group: 'CRM',
+    items: [
+      { href: '/admin/leads',     label: 'Leads',    icon: '📥' },
+      { href: '/admin/customers', label: 'Kunden',   icon: '👥' },
+    ],
+  },
+  {
+    group: 'Abrechnung',
+    items: [
+      { href: '/admin/invoices', label: 'Rechnungen', icon: '🧾' },
+    ],
+  },
+  {
+    group: 'Website',
+    items: [
+      { href: '/admin/anfragen',      label: 'Anfragen',      icon: '✉'  },
+      { href: '/admin/inhalte',       label: 'Hero-Texte',    icon: '✏'  },
+      { href: '/admin/demos',         label: 'Demos',         icon: '🎬' },
+      { href: '/admin/projekte',      label: 'Projekte',      icon: '🖥️' },
+      { href: '/admin/produkte',      label: 'Produkte',      icon: '📦' },
+      { href: '/admin/einstellungen', label: 'Einstellungen', icon: '⚙'  },
+    ],
+  },
 ]
 
 export default function AdminSidebar() {
@@ -36,27 +62,33 @@ export default function AdminSidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
-        {navItems.map(item => {
-          const isActive = item.href === '/admin'
-            ? pathname === '/admin'
-            : pathname.startsWith(item.href)
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-[#2563EB]/15 text-[#2563EB]'
-                  : 'text-white/45 hover:text-white/80 hover:bg-white/[0.05]'
-              }`}
-            >
-              <span className="text-base">{item.icon}</span>
-              {item.label}
-            </Link>
-          )
-        })}
+      <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5 overflow-y-auto">
+        {navGroups.map(({ group, items }) => (
+          <div key={group} className={group ? 'mt-4' : ''}>
+            {group && (
+              <p className="px-3 mb-1 text-[9px] font-bold uppercase tracking-widest text-white/20">{group}</p>
+            )}
+            {items.map(item => {
+              const isActive = item.href === '/admin'
+                ? pathname === '/admin'
+                : pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-[#2563EB]/15 text-[#2563EB]'
+                      : 'text-white/45 hover:text-white/80 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  <span className="text-base">{item.icon}</span>
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Footer */}

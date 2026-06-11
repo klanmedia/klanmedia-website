@@ -3,14 +3,17 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-type Anfrage = {
+type Lead = {
   id: string
   name: string
   email: string
-  phone: string | null
-  company: string | null
-  message: string
-  config: string | null
+  tel: string | null
+  nachricht: string | null
+  konfig_paket: string | null
+  konfig_hosting: string | null
+  konfig_features: string[] | null
+  konfig_preis_einmalig: number | null
+  konfig_preis_monatlich: number | null
   status: 'neu' | 'gelesen' | 'beantwortet'
   created_at: string
 }
@@ -30,9 +33,19 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-export default function AnfragenTable({ anfragen }: { anfragen: Anfrage[] }) {
+function KonfigBadge({ lead }: { lead: Lead }) {
+  const hasKonfig = lead.konfig_paket || lead.konfig_hosting || lead.konfig_features?.length
+  if (!hasKonfig) return null
+  return (
+    <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border bg-brand/5 text-brand border-brand/20">
+      Konfig
+    </span>
+  )
+}
+
+export default function AnfragenTable({ anfragen }: { anfragen: Lead[] }) {
   const router = useRouter()
-  const [selected, setSelected] = useState<Anfrage | null>(null)
+  const [selected, setSelected] = useState<Lead | null>(null)
   const [updating, setUpdating] = useState(false)
 
   async function updateStatus(id: string, status: string) {
@@ -43,7 +56,7 @@ export default function AnfragenTable({ anfragen }: { anfragen: Anfrage[] }) {
       body: JSON.stringify({ id, status }),
     })
     setUpdating(false)
-    if (selected?.id === id) setSelected(prev => prev ? { ...prev, status: status as Anfrage['status'] } : null)
+    if (selected?.id === id) setSelected(prev => prev ? { ...prev, status: status as Lead['status'] } : null)
     router.refresh()
   }
 
@@ -62,24 +75,24 @@ export default function AnfragenTable({ anfragen }: { anfragen: Anfrage[] }) {
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
-              {['Name', 'E-Mail', 'Unternehmen', 'Status', 'Datum'].map(h => (
+              {['Name', 'E-Mail', 'Konfig', 'Status', 'Datum'].map(h => (
                 <th key={h} className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-400">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {anfragen.map(req => (
+            {anfragen.map(lead => (
               <tr
-                key={req.id}
-                onClick={() => setSelected(req)}
-                className={`cursor-pointer transition-colors hover:bg-gray-50 ${selected?.id === req.id ? 'bg-blue-50' : ''}`}
+                key={lead.id}
+                onClick={() => setSelected(lead)}
+                className={`cursor-pointer transition-colors hover:bg-gray-50 ${selected?.id === lead.id ? 'bg-blue-50' : ''}`}
               >
-                <td className="px-5 py-3.5 font-medium text-gray-900">{req.name}</td>
-                <td className="px-5 py-3.5 text-gray-500">{req.email}</td>
-                <td className="px-5 py-3.5 text-gray-500">{req.company ?? '—'}</td>
-                <td className="px-5 py-3.5"><StatusBadge status={req.status} /></td>
+                <td className="px-5 py-3.5 font-medium text-gray-900">{lead.name}</td>
+                <td className="px-5 py-3.5 text-gray-500">{lead.email}</td>
+                <td className="px-5 py-3.5"><KonfigBadge lead={lead} /></td>
+                <td className="px-5 py-3.5"><StatusBadge status={lead.status} /></td>
                 <td className="px-5 py-3.5 text-gray-400">
-                  {new Date(req.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  {new Date(lead.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
                 </td>
               </tr>
             ))}
@@ -93,25 +106,62 @@ export default function AnfragenTable({ anfragen }: { anfragen: Anfrage[] }) {
           <div className="flex items-start justify-between">
             <div>
               <h3 className="font-bold text-gray-900">{selected.name}</h3>
-              <p className="text-sm text-gray-500">{selected.company ?? 'Kein Unternehmen'}</p>
+              <p className="text-sm text-gray-500">{selected.email}</p>
             </div>
             <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
           </div>
 
-          <div className="flex flex-col gap-2 text-sm">
-            <a href={`mailto:${selected.email}`} className="text-blue-600 hover:underline">{selected.email}</a>
-            {selected.phone && <span className="text-gray-600">{selected.phone}</span>}
-          </div>
+          {selected.tel && (
+            <p className="text-sm text-gray-600">{selected.tel}</p>
+          )}
 
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Nachricht</p>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selected.message}</p>
-          </div>
+          {selected.nachricht && (
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Nachricht</p>
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selected.nachricht}</p>
+            </div>
+          )}
 
-          {selected.config && (
-            <div className="bg-blue-50 rounded-xl p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 mb-2">Konfigurator-Auswahl</p>
-              <p className="text-sm text-blue-800 leading-relaxed">{selected.config}</p>
+          {/* Strukturierte Konfig-Anzeige */}
+          {(selected.konfig_paket || selected.konfig_hosting || selected.konfig_features?.length) && (
+            <div className="bg-brand/5 rounded-xl p-4 border border-brand/10">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-brand mb-3">Konfigurator-Auswahl</p>
+              <div className="flex flex-col gap-1.5 text-sm text-gray-700">
+                {selected.konfig_paket && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Paket</span>
+                    <span className="font-semibold capitalize">{selected.konfig_paket}</span>
+                  </div>
+                )}
+                {selected.konfig_hosting && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Hosting</span>
+                    <span className="font-semibold capitalize">{selected.konfig_hosting}</span>
+                  </div>
+                )}
+                {selected.konfig_features?.map(f => (
+                  <div key={f} className="flex items-center gap-2">
+                    <span className="text-brand">+</span>
+                    <span>{f}</span>
+                  </div>
+                ))}
+                {(selected.konfig_preis_einmalig != null || selected.konfig_preis_monatlich != null) && (
+                  <div className="border-t border-brand/10 mt-2 pt-2 flex flex-col gap-1">
+                    {selected.konfig_preis_einmalig != null && (
+                      <div className="flex justify-between font-semibold">
+                        <span className="text-gray-500">Einmalig</span>
+                        <span>{selected.konfig_preis_einmalig.toLocaleString('de-DE')} €</span>
+                      </div>
+                    )}
+                    {selected.konfig_preis_monatlich != null && (
+                      <div className="flex justify-between font-semibold">
+                        <span className="text-gray-500">Monatlich</span>
+                        <span>{selected.konfig_preis_monatlich.toLocaleString('de-DE')} €/Mo</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

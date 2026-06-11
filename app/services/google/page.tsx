@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import PageHero from '../../_components/PageHero'
 import HeroTitle from '../../_components/HeroTitle'
 import { getFlags, flag } from '@/lib/flags'
+import { ctaHref, ctaLabel } from '@/lib/cta'
 import { getHeroText } from '@/lib/content'
 import type { Metadata } from 'next'
 
@@ -43,8 +44,8 @@ export default async function GooglePage() {
                 </li>
               ))}
             </ul>
-            <Link href="/kontakt" className="block text-center border border-gray-200 text-gray-700 font-semibold text-sm px-6 py-3 rounded-lg hover:border-brand hover:text-brand transition-colors">
-              Anfragen
+            <Link href={ctaHref(flags)} className="block text-center border border-gray-200 text-gray-700 font-semibold text-sm px-6 py-3 rounded-lg hover:border-brand hover:text-brand transition-colors">
+              {ctaLabel(flags)}
             </Link>
           </div>
 
@@ -68,8 +69,8 @@ export default async function GooglePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/kontakt" className="block text-center bg-brand text-white font-semibold text-sm px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors" style={{ boxShadow: '0 0 25px rgba(37,99,235,0.3)' }}>
-                Anfragen
+              <Link href={ctaHref(flags)} className="block text-center bg-brand text-white font-semibold text-sm px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors" style={{ boxShadow: '0 0 25px rgba(37,99,235,0.3)' }}>
+                {ctaLabel(flags)}
               </Link>
             </div>
           )}

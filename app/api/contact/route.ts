@@ -3,15 +3,32 @@ import { supabaseAdmin } from '@/lib/supabase-server'
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const { name, email, phone, company, message, config } = body
+  const { name, email, phone, company, message, konfig } = body
 
-  if (!name || !email || !message) {
-    return NextResponse.json({ error: 'Name, E-Mail und Nachricht sind Pflichtfelder.' }, { status: 400 })
+  if (!name?.trim() || !email?.trim()) {
+    return NextResponse.json(
+      { error: 'Name und E-Mail sind erforderlich.' },
+      { status: 400 }
+    )
   }
 
-  const { error } = await supabaseAdmin
-    .from('contact_requests')
-    .insert({ name, email, phone: phone || null, company: company || null, message, config: config || null })
+  // company landet im Freitext (leads hat keine eigene company-Spalte)
+  const nachricht = [
+    company?.trim() ? `Unternehmen: ${company.trim()}` : null,
+    message?.trim() || null,
+  ].filter(Boolean).join('\n\n') || null
+
+  const { error } = await supabaseAdmin.from('leads').insert({
+    name:                  name.trim(),
+    email:                 email.trim(),
+    tel:                   phone?.trim()  || null,
+    nachricht,
+    konfig_paket:          konfig?.paket           ?? null,
+    konfig_hosting:        konfig?.hosting          ?? null,
+    konfig_features:       konfig?.features?.length ? konfig.features : null,
+    konfig_preis_einmalig: konfig?.preis_einmalig   ?? null,
+    konfig_preis_monatlich:konfig?.preis_monatlich  ?? null,
+  })
 
   if (error) {
     console.error('Supabase insert error:', error)

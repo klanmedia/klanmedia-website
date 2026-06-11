@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const { error } = await supabaseAdmin
-    .from('contact_requests').update({ status }).eq('id', id)
+    .from('leads').update({ status }).eq('id', id)
 
   if (error) return NextResponse.json({ error: 'Update fehlgeschlagen.' }, { status: 500 })
   return NextResponse.json({ success: true })

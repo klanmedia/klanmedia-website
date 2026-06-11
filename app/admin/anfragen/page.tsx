@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: 'Kontaktanfragen' }
 
 export default async function AnfragenPage() {
   const { data: anfragen } = await supabaseAdmin
-    .from('contact_requests')
+    .from('leads')
     .select('*')
     .order('created_at', { ascending: false })
 
