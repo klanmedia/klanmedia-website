@@ -11,6 +11,8 @@ type Project = {
   preis_einmalig: number | null
   preis_monatlich: number | null
   status: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  anforderungen_data: Record<string, any> | null
   created_at: string
 }
 
@@ -43,17 +45,16 @@ export default function CustomerProjectsManager({
   customerId: string
 }) {
   const router = useRouter()
-  const [projects, setProjects] = useState<Project[]>(initialProjects)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [projects, setProjects]               = useState<Project[]>(initialProjects)
+  const [editingId, setEditingId]             = useState<string | null>(null)
+  const [saving, setSaving]                   = useState(false)
+  const [deletingId, setDeletingId]           = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [deleteError, setDeleteError]         = useState<string | null>(null)
-  const [form, setForm] = useState<EditForm>({ paket: '', hosting: '', preis_einmalig: '', preis_monatlich: '', status: 'angebot' })
-  const [showAdd, setShowAdd] = useState(false)
-  const [addForm, setAddForm] = useState<EditForm>({ paket: '', hosting: '', preis_einmalig: '', preis_monatlich: '', status: 'angebot' })
-  const [adding, setAdding] = useState(false)
-
+  const [form, setForm]                       = useState<EditForm>({ paket: '', hosting: '', preis_einmalig: '', preis_monatlich: '', status: 'angebot' })
+  const [showAdd, setShowAdd]                 = useState(false)
+  const [addForm, setAddForm]                 = useState<EditForm>({ paket: '', hosting: '', preis_einmalig: '', preis_monatlich: '', status: 'angebot' })
+  const [adding, setAdding]                   = useState(false)
   function startEdit(p: Project) {
     setEditingId(p.id)
     setForm({
@@ -128,7 +129,7 @@ export default function CustomerProjectsManager({
     setAdding(false)
     if (res.ok) {
       const data = await res.json()
-      setProjects(prev => [data.project, ...prev])
+      setProjects(prev => [{ ...data.project, anforderungen_data: null }, ...prev])
       setShowAdd(false)
       setAddForm({ paket: '', hosting: '', preis_einmalig: '', preis_monatlich: '', status: 'angebot' })
       router.refresh()
@@ -180,74 +181,104 @@ export default function CustomerProjectsManager({
       ) : (
         <div className="divide-y divide-gray-100">
           {projects.map(p => {
-            const cfg = statusConfig[p.status] ?? statusConfig.angebot
-            const isEditing = editingId === p.id
+            const cfg                = statusConfig[p.status] ?? statusConfig.angebot
+            const isEditing          = editingId === p.id
             const isConfirmingDelete = confirmDeleteId === p.id
+            const hasRequirements    = !!p.anforderungen_data?.savedAt
 
             return (
               <div key={p.id}>
-                <div className="flex items-center gap-4 px-6 py-3.5">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-sm text-gray-900 capitalize">{p.paket ?? '—'}</span>
-                      {p.hosting && <span className="text-xs text-gray-400">· {p.hosting}</span>}
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${cfg.style}`}>
-                        {cfg.label}
-                      </span>
+                {/* Project row */}
+                <div className="px-6 py-4">
+                  <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm text-gray-900 capitalize">{p.paket ?? '—'}</span>
+                        {p.hosting && <span className="text-xs text-gray-400">· {p.hosting}</span>}
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${cfg.style}`}>
+                          {cfg.label}
+                        </span>
+                        {hasRequirements && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700">
+                            Anforderungen ✓
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {p.preis_einmalig ? eur(p.preis_einmalig) + ' einmalig' : ''}
+                        {p.preis_einmalig && p.preis_monatlich ? ' · ' : ''}
+                        {p.preis_monatlich ? eur(p.preis_monatlich) + '/Mo' : ''}
+                        {!p.preis_einmalig && !p.preis_monatlich ? 'Kein Preis' : ''}
+                        {' · '}{new Date(p.created_at).toLocaleDateString('de-DE')}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-400 mt-0.5">
-                      {p.preis_einmalig ? eur(p.preis_einmalig) + ' einmalig' : ''}
-                      {p.preis_einmalig && p.preis_monatlich ? ' · ' : ''}
-                      {p.preis_monatlich ? eur(p.preis_monatlich) + '/Mo' : ''}
-                      {!p.preis_einmalig && !p.preis_monatlich ? 'Kein Preis' : ''}
-                      {' · '}{new Date(p.created_at).toLocaleDateString('de-DE')}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <Link
-                      href={`/admin/invoices/new?customer=${customerId}&project=${p.id}`}
-                      className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
-                      title="Rechnung erstellen"
-                    >
-                      🧾
-                    </Link>
-                    <button
-                      onClick={() => isEditing ? setEditingId(null) : startEdit(p)}
-                      className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
-                        isEditing ? 'border-blue-200 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
-                      }`}
-                    >
-                      {isEditing ? 'Schließen' : 'Bearbeiten'}
-                    </button>
-                    {!isConfirmingDelete ? (
-                      <button
-                        onClick={() => setConfirmDeleteId(p.id)}
-                        className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors"
+
+                    <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                      <Link
+                        href={`/admin/invoices/new?customer=${customerId}&project=${p.id}`}
+                        className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                        title="Rechnung erstellen"
                       >
-                        Löschen
+                        🧾
+                      </Link>
+
+                      <button
+                        onClick={() => isEditing ? setEditingId(null) : startEdit(p)}
+                        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+                          isEditing ? 'border-blue-200 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {isEditing ? 'Schließen' : 'Bearbeiten'}
                       </button>
-                    ) : (
-                      <>
+
+                      {!isConfirmingDelete ? (
                         <button
-                          onClick={() => handleDelete(p.id)}
-                          disabled={deletingId === p.id}
-                          className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
+                          onClick={() => setConfirmDeleteId(p.id)}
+                          className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors"
                         >
-                          {deletingId === p.id ? '…' : 'Ja, löschen'}
+                          Löschen
                         </button>
-                        <button
-                          onClick={() => setConfirmDeleteId(null)}
-                          className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50"
-                        >
-                          Abbrechen
-                        </button>
-                      </>
-                    )}
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleDelete(p.id)}
+                            disabled={deletingId === p.id}
+                            className="text-xs font-bold px-2.5 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:opacity-60"
+                          >
+                            {deletingId === p.id ? '…' : 'Ja, löschen'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50"
+                          >
+                            Abbrechen
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Onboarding CTA */}
+                  <Link
+                    href={`/admin/customers/${customerId}/projects/${p.id}/onboarding`}
+                    className="mt-3 flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-indigo-100 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-200 transition-colors group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-lg">🚀</span>
+                      <div>
+                        <p className="text-sm font-bold text-indigo-800">Onboarding öffnen</p>
+                        <p className="text-xs text-indigo-500">
+                          {hasRequirements ? 'Anforderungen erfasst · Projektumsetzung verfolgen' : 'Anforderungen erfassen & Projektumsetzung verfolgen'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-indigo-400 text-lg group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
                 </div>
 
+                {/* Edit form */}
                 {isEditing && (
-                  <div className="px-6 pb-4 pt-1 bg-gray-50 border-t border-gray-100">
+                  <div className="px-6 pb-4 pt-3 bg-gray-50 border-t border-gray-100">
                     <ProjectFormFields form={form} setForm={setForm} inputCls={inputCls} />
                     <div className="flex gap-2 mt-3">
                       <button onClick={() => handleSave(p.id)} disabled={saving}

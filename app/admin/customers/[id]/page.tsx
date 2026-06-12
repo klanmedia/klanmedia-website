@@ -5,7 +5,6 @@ import type { Metadata } from 'next'
 import CustomerEditForm from './_components/CustomerEditForm'
 import CustomerDeleteButton from './_components/CustomerDeleteButton'
 import CustomerProjectsManager from './_components/CustomerProjectsManager'
-import OnboardingTool from '../../_components/OnboardingTool'
 import ClickableRow from '../../_components/ClickableRow'
 import StopPropLink from '../../_components/StopPropLink'
 
@@ -20,6 +19,8 @@ type Project = {
   status: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onboarding_data: Record<string, any> | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  anforderungen_data: Record<string, any> | null
   created_at: string
 }
 
@@ -135,13 +136,6 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             )}
           </div>
 
-          {/* Onboarding Tool */}
-          {primaryProject && (
-            <OnboardingTool
-              projectId={primaryProject.id}
-              initialData={primaryProject.onboarding_data}
-            />
-          )}
         </div>
 
         {/* Right sidebar */}

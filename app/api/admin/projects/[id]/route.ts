@@ -10,7 +10,7 @@ export async function GET(
   const { id } = await params
   const { data, error } = await supabaseAdmin
     .from('projects')
-    .select('id, paket, hosting, preis_einmalig, preis_monatlich, status, onboarding_data')
+    .select('id, paket, hosting, preis_einmalig, preis_monatlich, status, onboarding_data, anforderungen_data')
     .eq('id', id)
     .maybeSingle()
 
@@ -25,7 +25,7 @@ export async function PATCH(
   const { id } = await params
   const body = await req.json()
 
-  const allowed = ['paket', 'hosting', 'preis_einmalig', 'preis_monatlich', 'status']
+  const allowed = ['paket', 'hosting', 'preis_einmalig', 'preis_monatlich', 'status', 'anforderungen_data', 'onboarding_data']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) updates[key] = body[key] ?? null
